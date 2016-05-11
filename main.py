@@ -3,6 +3,12 @@ import win32com.client as win32
 import tkinter
 from time import sleep
 
+# file://oande.sig.oregonstate.edu/Ecampus/Files/CDT%20Student%20Workers/Jake/Projects/Transcription%20Tracker/HTML%20CSS/index.html
+
+# Have a menu that allows users to pick whether to start a new transcript or open an existing one
+# On new have them enter: course name, video name, and lesson
+# On open just have a selection window
+
 class Word:
     def __init__(self):
         """
@@ -16,20 +22,49 @@ class Word:
             A Word Object containing, word context, word version,
             and the document.
         """
-        self.Word = win32.gencache.EnsureDispatch('Word.Application')
-        self.Version = self.Word.Version
-        self.InitializeFunction = {'14.0': Word2010,
-                                   '15.0': Word2013}.get(self.Version, Word2010)
-        self.Doc = self.Word.Documents.Add()
-        self.Word.Visible = True
-    def Quit(self):
-        self.Word.Application.Quit()
-    def QuitNoSave(self):
-        self.Doc.Close(False)
-        self.Quit()
+        self.word = win32.gencache.EnsureDispatch('Word.Application')
+        self.version = self.word.Version
+        self.initialize_function = {'14.0': self.word2010,
+                                    '15.0': self.word2013}.get(self.version, self.word2010)
+        self.doc = self.word.Documents.Add()
+        self.word.Visible = True
+
+    def word2010(self):
+        # take course name, lesson and video name
+        rng = self.doc.Range(0, 0)
+        #this should be replaced with actual course info
+        title = "ST 351 – Lesson 3.1 – Stratified Sample Example"
+        title_len = len(title)
+        print(title_len)
+        rng.InsertAfter(title)
+
+        self.doc.Range(self.doc.Paragraphs(1).Range.Start,
+                        self.doc.Paragraphs(1).Range.End).Select()
+
+        docText = self.doc.ActiveWindow.Selection
+        docText.Style = self.doc.Styles("Title")
+
+        docText.InsertAfter("\nSlide 1:")
+
+        print(len(self.doc.Content.Text))
+
+        self.doc.Range(title_len, len(self.doc.Content.Text)).Select()
+        #self.doc.ActiveWindow.Selection.Style = self.doc.Styles("Heading 2")
+
+        sleep(5)
+
+    def word2013(self):
+        x=5
+
+    def quit(self):
+        self.word.Application.Quit()
+
+    def quit_no_save(self):
+        self.doc.Close(False)
+        self.quit()
 
 class Selection:
-    def __init__(self, selectionObject):
+    def __init__(self, selection_object):
         """
         Selection.__init__:
             This creates a Selection object, which is simply a wrapper for
@@ -43,17 +78,18 @@ class Selection:
         Returns: A Wrapped Selection Object
         """
 
-        self.Selection = selectionObject
-    def ChangeFont(self, font="", fontSize=None, fontStyle=(False,False)):
+        self.Selection = selection_object
+
+    def change_font(self, font="", font_size=None, font_style=(False, False)):
         """
-        ChangeFont:
+        change_font:
             This function modifies a selection object that has been
             set on initialization, with the following arguments
 
         Args:
             font (string): A font to select, e.g. 'Times New Roman'
-            fontSize (int): A size to make the font
-            fontStyle (bool tuple): Specifies whether to use bold and italics
+            font_size (int): A size to make the font
+            font_style (bool tuple): Specifies whether to use bold and italics
                 e.g. (True, False): use bold not italics
 
         Returns:
@@ -61,17 +97,13 @@ class Selection:
         """
         if font is not "":
             self.Selection.Font.Name = font
-        if fontSize is not None:
-            self.Selection.Font.Size = fontSize
-        self.Selection.Font.Bold = fontStyle[0]
-        self.Selection.Font.Italics = fontStyle[1]
+        if font_size is not None:
+            self.Selection.Font.Size = font_size
+        self.Selection.Font.Bold = font_style[0]
+        self.Selection.Font.Italics = font_style[1]
 
-
-def Word2010(doc):
-    print("Word 2010")
-
-def Word2013(doc):
-    print("Word 2013")
+    def set_title_style(self):
+        self.Selection.Font.StylisticSet = 8
 
 def initialize_document(doc, version):
     """Initialize and open Microsoft Word, with specified title"""
@@ -105,16 +137,19 @@ def main():
     #new word object
     word = Word()
 
-    word.InitializeFunction(word.Doc)
+    word.initialize_function()
 
     #initialize_document(word.Doc, word.Version)
 
-    word.QuitNoSave()
+    word.quit_no_save()
 
 if __name__ == '__main__':
     main()
 
 
+# VBA -> Python notes:
+#   ActiveDocument refers to doc in the Word class
+#
 # useful functions or members
 # with word defined:
 #   word.Version : the current word version used
@@ -126,7 +161,9 @@ if __name__ == '__main__':
 #   doc.Select() : selects the area specified by a range
 #   doc.ActiveWindow.Selection : assigns the selection to a variable
 #   doc.Content.Text : returns all text in the document. USE THIS TO CHECK IF IT HAS BEEN ADDED TO
-#   doc.Range(start, end): specifies a range to get, which can be added to or edited or removed
+#   doc.Range(start, end) : specifies a range to get, which can be added to or edited or removed
+#   doc.Styles(style_name) : when assigned to a selection's .Style property it will change it depending
+#                            on what style_name is, used as "Title" in this program
 #
 # with a selection or a range:
 #   selection.Font.Size = value : where selection is the selection, and size is assignable
