@@ -1,6 +1,7 @@
 import threading
 import win32com.client as win32
-import tkinter
+from tkinter import *
+from tkinter import ttk
 from time import sleep
 
 # file://oande.sig.oregonstate.edu/Ecampus/Files/CDT%20Student%20Workers/Jake/Projects/Transcription%20Tracker/HTML%20CSS/index.html
@@ -33,7 +34,7 @@ class Word:
         # take course name, lesson and video name
         rng = self.doc.Range(0, 0)
         #this should be replaced with actual course info
-        title = "ST 351 – Lesson 3.1 – Stratified Sample Example"
+        title = "ST 351 – Lesson 3.1 – Stratified Sample Example\n"
         title_len = len(title)
         print(title_len)
         rng.InsertAfter(title)
@@ -44,12 +45,12 @@ class Word:
         docText = self.doc.ActiveWindow.Selection
         docText.Style = self.doc.Styles("Title")
 
-        docText.InsertAfter("\nSlide 1:")
+        docText.InsertAfter("Slide 1:")
 
         print(len(self.doc.Content.Text))
 
         self.doc.Range(title_len, len(self.doc.Content.Text)).Select()
-        #self.doc.ActiveWindow.Selection.Style = self.doc.Styles("Heading 2")
+        self.doc.ActiveWindow.Selection.Style = self.doc.Styles("Heading 2")
 
         sleep(5)
 
@@ -143,9 +144,46 @@ def main():
 
     word.quit_no_save()
 
-if __name__ == '__main__':
-    main()
+def ui():
+    root = Tk()
+    root.title("Transcription Tracker")
 
+    mainframe = ttk.Frame(root, padding="3 3 12 12")
+    mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
+    mainframe.columnconfigure(0, weight=1)
+    mainframe.rowconfigure(0, weight=1)
+
+    course_name = StringVar()
+    week = StringVar()
+    video_name = StringVar()
+    num_slides = IntVar()
+
+    #creating entry text boxes
+    course_name_entry = ttk.Entry(mainframe, width=5, textvariable=course_name)
+    week_entry = ttk.Entry(mainframe, width=3, textvariable=week)
+    video_name_entry = ttk.Entry(mainframe, width=12, textvariable=video_name)
+    num_slides_entry = ttk.Entry(mainframe, width=3, textvariable=num_slides)
+
+    #aligning on grid
+    course_name_entry.grid(column=1, row=1, sticky=(N, W))
+    week_entry.grid(column=2, row=1, sticky=(N))
+    video_name_entry.grid(column=1, row=2, sticky=(N, W))
+    num_slides_entry.grid(column=3, row=1, sticky=(N, E))
+
+
+    ttk.Button(mainframe, text="Go", command=main).grid(column=3, row=3, sticky=E)
+
+    #set up labels for the ui
+
+    for child in mainframe.winfo_children(): child.grid_configure(padx=5, pady=5)
+
+    course_name_entry.focus()
+    root.bind('<Return>', main)
+
+    root.mainloop()
+
+if __name__ == '__main__':
+    ui()
 
 # VBA -> Python notes:
 #   ActiveDocument refers to doc in the Word class
