@@ -1,6 +1,6 @@
 import threading
 import win32com.client as win32
-from tkinter import *
+import tkinter as tk
 from tkinter import ttk
 from time import sleep
 
@@ -26,18 +26,22 @@ class Word:
         self.word = win32.gencache.EnsureDispatch('Word.Application')
         self.version = self.word.Version
         self.initialize_function = {'14.0': self.word2010,
-                                    '15.0': self.word2013}.get(self.version, self.word2010)
+                                    '15.0': self.word2013,
+                                    '16.0': self.word2016}.get(self.version, self.word2010)
         self.doc = self.word.Documents.Add()
         self.word.Visible = True
 
-    def word2010(self):
+    def word2010(self, details):
         # take course name, lesson and video name
-        rng = self.doc.Range(0, 0)
+        doc_start = self.doc.Range(0, 0)
         #this should be replaced with actual course info
-        title = "ST 351 – Lesson 3.1 – Stratified Sample Example\n"
+        title = details.Course + " - Week " + details.Week + " - " + details.Video + "\n"
+        #handle num slides
         title_len = len(title)
+
         print(title_len)
-        rng.InsertAfter(title)
+
+        doc_start.InsertAfter(title)
 
         self.doc.Range(self.doc.Paragraphs(1).Range.Start,
                         self.doc.Paragraphs(1).Range.End).Select()
@@ -54,7 +58,10 @@ class Word:
 
         sleep(5)
 
-    def word2013(self):
+    def word2013(self, details):
+        self.word2010(details)
+
+    def word2016(self, details):
         x=5
 
     def quit(self):
@@ -64,126 +71,135 @@ class Word:
         self.doc.Close(False)
         self.quit()
 
-class Selection:
-    def __init__(self, selection_object):
+class Word_Details:
+    def __init__(self, course_name, week, video_name, num_slides):
+        self.Course = str(course_name)
+        self.Week = str(week)
+        self.Video = str(video_name)
+        self.Slides = num_slides
+
+class UI:
+    def __init__(self):
         """
-        Selection.__init__:
-            This creates a Selection object, which is simply a wrapper for
-            the VBA word selection object.
-
-        Args:
-            selectionObject (VBA Selection Object): This should be a range of
-                text that has been selected in the word document. Text is
-                selected through use of the .Select() function
-
-        Returns: A Wrapped Selection Object
-        """
-
-        self.Selection = selection_object
-
-    def change_font(self, font="", font_size=None, font_style=(False, False)):
-        """
-        change_font:
-            This function modifies a selection object that has been
-            set on initialization, with the following arguments
-
-        Args:
-            font (string): A font to select, e.g. 'Times New Roman'
-            font_size (int): A size to make the font
-            font_style (bool tuple): Specifies whether to use bold and italics
-                e.g. (True, False): use bold not italics
+        A generic UI class that will handle the new/open menu,
+        the creation menu, and the timer menu for use
 
         Returns:
-            void: Simply modifies the text in the selection of the word document
+            Object, a tkinter object with basic settings initialized
+            namely self.Root and self.Mainframe
+
         """
-        if font is not "":
-            self.Selection.Font.Name = font
-        if font_size is not None:
-            self.Selection.Font.Size = font_size
-        self.Selection.Font.Bold = font_style[0]
-        self.Selection.Font.Italics = font_style[1]
+        self.Root = tk.Tk()
+        self.Root.title("Transcription Tracker")
+        self.Mainframe = ttk.Frame(self.Root, padding="3 3 12 12")
+        self.Mainframe.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E, tk.S))
+        self.Mainframe.columnconfigure(0, weight=1)
+        self.Mainframe.rowconfigure(0, weight=1)
 
-    def set_title_style(self):
-        self.Selection.Font.StylisticSet = 8
+    def Destroy(self):
+        self.Root.destroy()
 
-def initialize_document(doc, version):
-    """Initialize and open Microsoft Word, with specified title"""
+class Menu(UI):
 
+    @staticmethod
+    def New_Or_Open(self):
+        ui = UI()
+        # button initialization
+        ttk.Label(ui.Mainframe, text="Create a new document, or open a current document.")\
+            .grid(column=2, row=1, sticky=tk.N)
 
+        ttk.Button(ui.Mainframe, text="New", command=self.Destroy_And_Call(ui, self.New_Document))\
+            .grid(column=2, row=2, sticky=tk.E)
+        ttk.Button(ui.Mainframe, text="Open", command=self.Destroy_And_Call(ui, self.Open_Document))\
+            .grid(column=3, row=2, sticky=tk.W)
 
-    #sleep(1)
+        for child in ui.Mainframe.winfo_children(): child.grid_configure(padx=5, pady=5)
 
-    rng = doc.Range(0,0)
-    rng.InsertAfter('Word Application.\n\n')
-    #sleep(1)
+        ui.Root.mainloop()
 
-    print(len(doc.Content.Text))
+    @staticmethod
+    def Open_Document(self):
+        x=5
 
-    rngParagraphs = doc.Range(doc.Paragraphs(1).Range.Start, doc.Paragraphs(1).Range.End)
-    rngParagraphs.Select()
-    rngParagraphs.Font.Name = "Arial"
-    #doc.ActiveWindow.Selection.Font.Size(14)
+    @staticmethod
+    def New_Document(self):
+        x=5
 
-    #selection = doc.Sentences(1).Select
-    docText = doc.ActiveWindow.Selection
-    docText.Font.Size = 20
+    @staticmethod
+    def Timer(self):
+        x=5
 
-    print(str(docText))
-    sleep(5)
-    #closes without saving
-    doc.Close(False)
+    @staticmethod
+    def Destroy_And_Call(self, ui, function):
+        ui.Destroy()
+        function()
 
+def main(details):
+    #arg is a Word_Details object
 
-def main():
     #new word object
     word = Word()
 
-    word.initialize_function()
+    word.initialize_function(details)
 
     #initialize_document(word.Doc, word.Version)
 
-    word.quit_no_save()
+    #word.quit_no_save()
 
-def ui():
-    root = Tk()
-    root.title("Transcription Tracker")
-
-    mainframe = ttk.Frame(root, padding="3 3 12 12")
-    mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
-    mainframe.columnconfigure(0, weight=1)
-    mainframe.rowconfigure(0, weight=1)
-
-    course_name = StringVar()
-    week = StringVar()
-    video_name = StringVar()
-    num_slides = IntVar()
-
-    #creating entry text boxes
-    course_name_entry = ttk.Entry(mainframe, width=5, textvariable=course_name)
-    week_entry = ttk.Entry(mainframe, width=3, textvariable=week)
-    video_name_entry = ttk.Entry(mainframe, width=12, textvariable=video_name)
-    num_slides_entry = ttk.Entry(mainframe, width=3, textvariable=num_slides)
-
-    #aligning on grid
-    course_name_entry.grid(column=1, row=1, sticky=(N, W))
-    week_entry.grid(column=2, row=1, sticky=(N))
-    video_name_entry.grid(column=1, row=2, sticky=(N, W))
-    num_slides_entry.grid(column=3, row=1, sticky=(N, E))
-
-
-    ttk.Button(mainframe, text="Go", command=main).grid(column=3, row=3, sticky=E)
-
-    #set up labels for the ui
-
-    for child in mainframe.winfo_children(): child.grid_configure(padx=5, pady=5)
-
-    course_name_entry.focus()
-    root.bind('<Return>', main)
-
-    root.mainloop()
+# def ui():
+#     root = Tk()
+#     root.title("Transcription Tracker")
+#
+#     mainframe = ttk.Frame(root, padding="3 3 12 12")
+#     mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
+#     mainframe.columnconfigure(0, weight=1)
+#     mainframe.rowconfigure(0, weight=1)
+#
+#     course_name = StringVar()
+#     week = IntVar()
+#     video_name = Text(mainframe, height=3, width=40)
+#     num_slides = IntVar()
+#
+#     # text_area = Text()
+#     # ScrollBar = Scrollbar(root)
+#     # ScrollBar.config(command=text_area.yview)
+#     # text_area.config(yscrollcommand=ScrollBar.set)
+#     # ScrollBar.pack(side=RIGHT, fill=Y)
+#     # text_area.pack(expand=YES, fill=BOTH)
+#
+#     #creating entry text boxes
+#     course_name_entry = ttk.Entry(mainframe, width=12, textvariable=course_name)
+#     week_entry = ttk.Entry(mainframe, width=3, textvariable=week)
+#     num_slides_entry = ttk.Entry(mainframe, width=3, textvariable=num_slides)
+#
+#     #aligning on grid
+#     course_name_entry.grid(column=2, row=1, sticky=W)
+#     week_entry.grid(column=2, row=2, sticky=W)
+#     video_name.grid(column=2, row=3)
+#     num_slides_entry.grid(column=2, row=5, sticky=W)
+#
+#
+#     ttk.Button(mainframe, text="Go",
+#                command=lambda: main(Word_Details(course_name.get(), week.get(),
+#                                                  video_name.get("1.0", END), num_slides.get())))\
+#         .grid(column=3, row=6, sticky=E)
+#
+#     #set up labels for the ui
+#     ttk.Label(mainframe, text="Course Name:").grid(column=1, row=1, sticky=W)
+#     ttk.Label(mainframe, text="Week Number:").grid(column=1, row=2, sticky=W)
+#     ttk.Label(mainframe, text="Video Name:").grid(column=1, row=3, sticky=W)
+#     ttk.Label(mainframe, text="Number of Slides:").grid(column=1, row=5, sticky=W)
+#
+#     for child in mainframe.winfo_children(): child.grid_configure(padx=5, pady=5)
+#
+#     course_name_entry.focus()
+#     root.bind('<Return>', main)
+#
+#     root.mainloop()
 
 if __name__ == '__main__':
-    ui()
+    interface = UI()
+    interface.New_Or_Open()
 
 # VBA -> Python notes:
 #   ActiveDocument refers to doc in the Word class
