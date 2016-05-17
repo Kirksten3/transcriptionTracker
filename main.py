@@ -23,6 +23,7 @@ class Word:
             A Word Object containing, word context, word version,
             and the document.
         """
+
         self.word = win32.gencache.EnsureDispatch('Word.Application')
         self.version = self.word.Version
         self.initialize_function = {'14.0': self.Word2010,
@@ -69,6 +70,16 @@ class Word:
     def Word2016(self, details):
         x=5
 
+    @staticmethod
+    def Check_Word_Status():
+        """
+        Check and see if word is still running, if not then save timer number and update
+        """
+        try:
+            word = win32.GetActiveObject('Word.Application')
+        except:
+            x=5
+
     def Quit(self):
         self.word.Application.Quit()
 
@@ -81,7 +92,7 @@ class Word_Details:
         self.Course = str(course_name)
         self.Week = str(week)
         self.Video = str(video_name)
-        self.Slides = num_slides
+        self.Slides = str(num_slides)
 
 class UI:
     def __init__(self, is_timer=False):
@@ -189,10 +200,92 @@ class Menu(UI):
 
     @staticmethod
     def Timer():
+
+        global timer_field, time_label
+
+        #init empty timer
+        timer_field = ['0', '0', ':', '0', '0', ':', '0', '0']
+
         ui = UI()
 
         #static "init" function
         Word.Start_Word(Menu.Details)
+        ttk.Label(ui.Mainframe, text="Time Transcribing: ").grid(column=1, row=1, sticky=tk.W)
+        time_label = ttk.Label(ui.Mainframe, text=Menu.Print_Time())
+        time_label.grid(column=2, row=1)
+        ttk.Button(ui.Mainframe, text="Save and Quit", command=lambda x: x*5).grid(column=2, row=2, sticky=tk.E)
+
+        for child in ui.Mainframe.winfo_children(): child.grid_configure(padx=5, pady=5)
+
+        Menu.Timer_Update(ui)
+
+        ui.Root.mainloop()
+
+    @staticmethod
+    def Print_Time():
+        global timer_field
+
+        time = ""
+        for x in range(len(timer_field)): time += timer_field[x]
+
+        print(time)
+
+        return time
+
+    @staticmethod
+    def Timer_Update(ui):
+        global timer_field, time_label
+
+
+        rev_array = list(reversed(timer_field))
+        seconds = int(rev_array[0] + rev_array[1])
+        minutes = int(rev_array[3] + rev_array[4])
+        hours = int(rev_array[6] + rev_array[7])
+
+        if seconds == 60:
+            if minutes == 60:
+                minutes = 0
+                hours += 1
+            else:
+                minutes += 1
+                seconds = 0
+        else:
+            seconds += 1
+
+        string_seconds = str(seconds)
+        string_minutes = str(minutes)
+        string_hours = str(hours)
+
+        rev_array[0] = string_seconds[1]
+        try:
+            rev_array[1] = string_seconds[0]
+        except IndexError:
+            rev_array[1] = '0'
+        rev_array[3] = string_minutes[1]
+        try:
+            rev_array[4] = string_minutes[0]
+        except IndexError:
+            rev_array[4] = '0'
+        rev_array[6] = string_hours[1]
+        try:
+            rev_array[7] = string_hours[0]
+        except IndexError:
+            rev_array[7] = '0'
+
+        timer_field = list(reversed(rev_array))
+
+        # update label
+        time_label.configure(text=Menu.Print_Time())
+        ui.Root.after(1000, lambda: Menu.Timer_Update(ui))
+
+
+    @staticmethod
+    def Timer_Check():
+        """
+        check to see if user has not typed for 3 minutes
+        """
+        global timer_field
+
 
 
     @staticmethod
@@ -216,6 +309,18 @@ class Menu(UI):
     def Destroy_And_Call(ui, function):
         ui.Destroy()
         function()
+
+class Timing_Thread(threading.Thread):
+    def __init__(self, sleep, function):
+        self.function = function
+        self.sleep = sleep()
+        threading.Thread.__init__(self)
+        self.setDaemon(1)
+
+    def Run(self):
+        while 1:
+            sleep(self.sleep)
+            self.function()
 
 
 
@@ -259,8 +364,9 @@ class Menu(UI):
 #
 
 if __name__ == '__main__':
-
     Menu.New_Or_Open()
+
+
 
 # VBA -> Python notes:
 #   ActiveDocument refers to doc in the Word class
