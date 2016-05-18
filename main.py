@@ -3,12 +3,18 @@ import win32com.client as win32
 import tkinter as tk
 from tkinter import ttk
 from time import sleep
+from enum import Enum
 
 # file://oande.sig.oregonstate.edu/Ecampus/Files/CDT%20Student%20Workers/Jake/Projects/Transcription%20Tracker/HTML%20CSS/index.html
 
 # Have a menu that allows users to pick whether to start a new transcript or open an existing one
 # On new have them enter: course name, video name, and lesson
 # On open just have a selection window
+
+class DOC_STATUS(Enum):
+    DOC_LENGTH_CHANGED = 0
+    DOC_LENGTH_SAME = 1
+    DOC_CLOSED = 2
 
 class Word:
     def __init__(self):
@@ -76,9 +82,35 @@ class Word:
         Check and see if word is still running, if not then save timer number and update
         """
         try:
-            word = win32.GetActiveObject('Word.Application')
+            win32.GetActiveObject('Word.Application')
         except:
-            x=5
+            return False
+        else:
+            # instance exists!
+            return True
+
+    @staticmethod
+    def Check_Document_Length(previous_length):
+        if not Word.Check_Word_Status():
+            return DOC_STATUS.DOC_CLOSED
+
+        else:
+            word = win32.GetActiveObject('Word.Application')
+            doc = word.ActiveDocument
+            if (len(doc.Content.Text) == previous_length):
+                return DOC_STATUS.DOC_LENGTH_SAME, previous_length
+            else:
+                return DOC_STATUS.DOC_LENGTH_CHANGED, len(doc.Content.Text)
+
+    @staticmethod
+    def Get_Document_Length():
+        if not Word.Check_Word_Status():
+            return DOC_STATUS.DOC_CLOSED
+
+        else:
+            word = win32.GetActiveObject('Word.Application')
+            doc = word.ActiveDocument
+            return len(doc.Content.Text)
 
     def Quit(self):
         self.word.Application.Quit()
@@ -201,92 +233,90 @@ class Menu(UI):
     @staticmethod
     def Timer():
 
-        global timer_field, time_label
-
         #init empty timer
-        timer_field = ['0', '0', ':', '0', '0', ':', '0', '0']
+        timer_field = ['0', '0', ':', '5', '9', ':', '5', '5']
+
 
         ui = UI()
 
         #static "init" function
         Word.Start_Word(Menu.Details)
+        previous_doc_length = Word.Get_Document_Length()
         ttk.Label(ui.Mainframe, text="Time Transcribing: ").grid(column=1, row=1, sticky=tk.W)
-        time_label = ttk.Label(ui.Mainframe, text=Menu.Print_Time())
+        time_label = ttk.Label(ui.Mainframe, text=Menu.Print_Time(timer_field))
         time_label.grid(column=2, row=1)
         ttk.Button(ui.Mainframe, text="Save and Quit", command=lambda x: x*5).grid(column=2, row=2, sticky=tk.E)
 
         for child in ui.Mainframe.winfo_children(): child.grid_configure(padx=5, pady=5)
 
-        Menu.Timer_Update(ui)
-
+        Menu.Timer_Update(ui, timer_field, time_label, previous_doc_length, 0)
         ui.Root.mainloop()
 
     @staticmethod
-    def Print_Time():
-        global timer_field
-
-        time = ""
-        for x in range(len(timer_field)): time += timer_field[x]
-
-        print(time)
-
-        return time
+    def Print_Time(timer):
+        return ''.join(timer)
 
     @staticmethod
-    def Timer_Update(ui):
-        global timer_field, time_label
+    def Timer_Update(ui, timer, label, previous_length, count=0):
 
+        # timer layout: ['0', '0', ':', '0', '0', ':', '0', '0']
 
-        rev_array = list(reversed(timer_field))
-        seconds = int(rev_array[0] + rev_array[1])
-        minutes = int(rev_array[3] + rev_array[4])
-        hours = int(rev_array[6] + rev_array[7])
+        seconds = int(timer[6] + timer[7])
+        minutes = int(timer[3] + timer[4])
+        hours = int(timer[0] + timer[1])
 
-        if seconds == 60:
-            if minutes == 60:
+        if seconds == 59:
+            if minutes == 59:
+                seconds = 0
                 minutes = 0
                 hours += 1
             else:
-                minutes += 1
                 seconds = 0
+                minutes += 1
         else:
             seconds += 1
+
+        # every 180 seconds check to see if document length has changed
+        # if it hasn't remove the last three minutes or if document has closed
+        if count == 180:
+            status, new_length = Word.Check_Document_Length(previous_length)
+            if status == DOC_STATUS.DOC_LENGTH_SAME:
+                minutes = minutes - 3
+            elif status == DOC_STATUS.DOC_LENGTH_CHANGED:
+                previous_length = new_length
+            elif status == DOC_STATUS.DOC_CLOSED:
+                # CLOSE DOCUMENT HERE
+                exit(1)
 
         string_seconds = str(seconds)
         string_minutes = str(minutes)
         string_hours = str(hours)
 
-        rev_array[0] = string_seconds[1]
-        try:
-            rev_array[1] = string_seconds[0]
-        except IndexError:
-            rev_array[1] = '0'
-        rev_array[3] = string_minutes[1]
-        try:
-            rev_array[4] = string_minutes[0]
-        except IndexError:
-            rev_array[4] = '0'
-        rev_array[6] = string_hours[1]
-        try:
-            rev_array[7] = string_hours[0]
-        except IndexError:
-            rev_array[7] = '0'
+        # had to declare new array because strings had problems...
+        temp_time = []
+        if len(string_hours) == 1:
+            string_hours = '0' + string_hours
 
-        timer_field = list(reversed(rev_array))
+        temp_time.append(string_hours[0])
+        temp_time.append(string_hours[1])
+        temp_time.append(':')
+
+        if len(string_minutes) == 1:
+            string_minutes = '0' + string_minutes
+
+        temp_time.append(string_minutes[0])
+        temp_time.append(string_minutes[1])
+        temp_time.append(':')
+
+        if len(string_seconds) == 1:
+            string_seconds = '0' + string_seconds
+
+        temp_time.append(string_seconds[0])
+        temp_time.append(string_seconds[1])
 
         # update label
-        time_label.configure(text=Menu.Print_Time())
-        ui.Root.after(1000, lambda: Menu.Timer_Update(ui))
-
-
-    @staticmethod
-    def Timer_Check():
-        """
-        check to see if user has not typed for 3 minutes
-        """
-        global timer_field
-
-
+        label.configure(text=Menu.Print_Time(temp_time))
+        ui.Root.after(1000, lambda: Menu.Timer_Update(ui, temp_time, label, previous_length, count))
 
     @staticmethod
     def Validate_Word_Details(ui, function, calling_function, details):
@@ -364,7 +394,8 @@ class Timing_Thread(threading.Thread):
 #
 
 if __name__ == '__main__':
-    Menu.New_Or_Open()
+    #Menu.New_Or_Open()
+    Menu.Timer()
 
 
 
