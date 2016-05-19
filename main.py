@@ -234,7 +234,7 @@ class Menu(UI):
     def Timer():
 
         #init empty timer
-        timer_field = ['0', '0', ':', '5', '9', ':', '5', '5']
+        timer_field = ['0', '0', ':', '0', '0', ':', '0', '0']
 
 
         ui = UI()
@@ -242,6 +242,7 @@ class Menu(UI):
         #static "init" function
         Word.Start_Word(Menu.Details)
         previous_doc_length = Word.Get_Document_Length()
+        print(previous_doc_length)
         ttk.Label(ui.Mainframe, text="Time Transcribing: ").grid(column=1, row=1, sticky=tk.W)
         time_label = ttk.Label(ui.Mainframe, text=Menu.Print_Time(timer_field))
         time_label.grid(column=2, row=1)
@@ -276,9 +277,12 @@ class Menu(UI):
         else:
             seconds += 1
 
+        print(count)
+
         # every 180 seconds check to see if document length has changed
         # if it hasn't remove the last three minutes or if document has closed
         if count == 180:
+            print(count)
             status, new_length = Word.Check_Document_Length(previous_length)
             if status == DOC_STATUS.DOC_LENGTH_SAME:
                 minutes = minutes - 3
@@ -314,6 +318,8 @@ class Menu(UI):
         temp_time.append(string_seconds[0])
         temp_time.append(string_seconds[1])
 
+
+        count += 1
         # update label
         label.configure(text=Menu.Print_Time(temp_time))
         ui.Root.after(1000, lambda: Menu.Timer_Update(ui, temp_time, label, previous_length, count))
@@ -352,51 +358,9 @@ class Timing_Thread(threading.Thread):
             sleep(self.sleep)
             self.function()
 
-
-
-# def Start_Word(details):
-#     #arg is a Word_Details object
-#
-#     #new word object
-#     word = Word()
-#
-#     word.initialize_function(details)
-#
-#     #initialize_document(word.Doc, word.Version)
-#
-#     #word.quit_no_save()
-
-# def ui():
-#     root = Tk()
-#     root.title("Transcription Tracker")
-#
-#     mainframe = ttk.Frame(root, padding="3 3 12 12")
-#     mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
-#     mainframe.columnconfigure(0, weight=1)
-#     mainframe.rowconfigure(0, weight=1)
-#
-#     course_name = StringVar()
-#     week = IntVar()
-#     video_name = Text(mainframe, height=3, width=40)
-#     num_slides = IntVar()
-#
-#     # text_area = Text()
-#     # ScrollBar = Scrollbar(root)
-#     # ScrollBar.config(command=text_area.yview)
-#     # text_area.config(yscrollcommand=ScrollBar.set)
-#     # ScrollBar.pack(side=RIGHT, fill=Y)
-#     # text_area.pack(expand=YES, fill=BOTH)
-#
-#     #creating entry text boxes
-
-#
-#
-#
-
 if __name__ == '__main__':
-    #Menu.New_Or_Open()
-    Menu.Timer()
-
+    Menu.New_Or_Open()
+    #Menu.Timer()
 
 
 # VBA -> Python notes:
