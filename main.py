@@ -1,4 +1,3 @@
-import threading
 import win32com.client as win32
 import tkinter as tk
 from tkinter import ttk
@@ -47,7 +46,12 @@ class Word:
         # take course name, lesson and video name
         doc_start = self.doc.Range(0, 0)
         #this should be replaced with actual course info
+
         title = details.Course + " - Week " + details.Week + " - " + details.Video + "\n"
+
+        if details.Week == "":
+            title = details.Course + " - " + details.Video + "\n"
+
         #handle num slides
         title_len = len(title)
 
@@ -157,6 +161,58 @@ class UI:
     def Destroy(self):
         self.Root.destroy()
 
+class User(UI):
+    def __init__(self):
+        # error here
+        self.ui = super().__init__()
+        self.Login()
+        self.Valid = False
+        self.Name = ""
+
+    def Login(self):
+        ttk.Label(self.ui.Mainframe, text="Login or Register. If logging in, only an ID is necessary.") \
+            .grid(column=1, row=1, sticky=tk.W)
+        ttk.Label(self.ui.Mainframe, text="OSU ID:").grid(column=1, row=2, sticky=tk.W)
+        ttk.Label(self.ui.Mainframe, text="Name:").grid(column=1, row=3, sticky=tk.W)
+
+        osu_id = tk.StringVar()
+        name = tk.StringVar()
+
+        # set up entries with placeholders, will need an event handler for focus in
+        tk.Entry(self.ui.Mainframe, width=15, textvariable=osu_id).grid(column=1, row=2)
+        tk.Entry(self.ui.Mainframe, width=15, textvariable=name).grid(column=1, row=3)
+
+        ttk.Button(self.ui.Mainframe, text="Login",
+                   command=lambda: self.Handle_Login(osu_id.get())).grid(column=2, row=4, sticky=tk.E)
+
+        ttk.Button(self.ui.Mainframe, text="Register",
+                   command=lambda: self.Handle_Register(osu_id.get(), name.get())).grid(column=3, row=4, sticky=tk.E)
+
+        for child in self.ui.Mainframe.winfo_children(): child.grid_configure(padx=5, pady=5)
+
+        self.ui.Root.mainloop()
+
+    def Handle_Login(self, id):
+        status = File_Handler.Check_File(id)
+        if not status: print("Failed to Login, try registering first.\n")
+        else:
+            self.Name = status.split('&')[1]
+            self.Valid = True
+            self.ui.Destroy()
+            Menu.New_Or_Open()
+
+    def Handle_Register(self, id, name):
+        File_Handler.Add_To_File(id, name)
+        status = File_Handler.Check_File(id)
+        if not status:
+            print("Failed to Register, exiting.\n")
+            exit(1)
+        else:
+            self.Name = status.split('&')[1]
+            self.Valid = True
+            self.ui.Destroy()
+            Menu.New_Or_Open()
+
 class Menu(UI):
     # holds the Word_Details class info
     Details = ""
@@ -228,7 +284,6 @@ class Menu(UI):
         # ui.Root.bind('<Return>', main)
 
         ui.Root.mainloop()
-
 
     @staticmethod
     def Timer():
@@ -346,20 +401,25 @@ class Menu(UI):
         ui.Destroy()
         function()
 
-class Timing_Thread(threading.Thread):
-    def __init__(self, sleep, function):
-        self.function = function
-        self.sleep = sleep()
-        threading.Thread.__init__(self)
-        self.setDaemon(1)
+class File_Handler():
+    path = 'users.txt'
+    sentinel = '&'
 
-    def Run(self):
-        while 1:
-            sleep(self.sleep)
-            self.function()
+    @staticmethod
+    def Check_File(symbol):
+        with open(File_Handler.path, 'r') as file:
+            for line in file:
+                if symbol in line:
+                    return line
+        return False
+
+    @staticmethod
+    def Add_To_File(prefix, suffix):
+        with open(File_Handler.path, 'a+') as file:
+            file.write(prefix + File_Handler.sentinel + suffix + '\n')
 
 if __name__ == '__main__':
-    Menu.New_Or_Open()
+    user = User()
     #Menu.Timer()
 
 
