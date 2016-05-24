@@ -78,7 +78,7 @@ class Word:
         self.Word2010(details)
 
     def Word2016(self, details):
-        x=5
+        self.Word2010(details)
 
     @staticmethod
     def Check_Word_Status():
