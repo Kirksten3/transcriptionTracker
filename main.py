@@ -3,6 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 from time import sleep
 from enum import Enum
+import requests
 
 # file://oande.sig.oregonstate.edu/Ecampus/Files/CDT%20Student%20Workers/Jake/Projects/Transcription%20Tracker/HTML%20CSS/index.html
 
@@ -161,10 +162,10 @@ class UI:
     def Destroy(self):
         self.Root.destroy()
 
-class User(UI):
+class User():
     def __init__(self):
         # error here
-        self.ui = super().__init__()
+        self.ui = UI()
         self.Login()
         self.Valid = False
         self.Name = ""
@@ -197,6 +198,10 @@ class User(UI):
         if not status: print("Failed to Login, try registering first.\n")
         else:
             self.Name = status.split('&')[1]
+            r = requests.post('https://dev.ecampus.oregonstate.edu/transcriptionTracker/',
+                              data = {'id': id})
+            if not User.Validate(r.text):
+
             self.Valid = True
             self.ui.Destroy()
             Menu.New_Or_Open()
@@ -209,9 +214,20 @@ class User(UI):
             exit(1)
         else:
             self.Name = status.split('&')[1]
+            # url: https://dev.ecampus.oregonstate.edu/transcriptionTracker/
+            r = requests.post('https://dev.ecampus.oregonstate.edu/transcriptionTracker/',
+                              data = {'name': self.Name, 'id': id})
+            if not User.Validate(r.text):
+                print('Unable to Register')
+                exit(1)
             self.Valid = True
             self.ui.Destroy()
             Menu.New_Or_Open()
+
+    @staticmethod
+    def Validate(text):
+        if 'Valid' in text: return True
+        else: return False
 
 class Menu(UI):
     # holds the Word_Details class info
