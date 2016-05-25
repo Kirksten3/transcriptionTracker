@@ -11,10 +11,12 @@ import requests
 # On new have them enter: course name, video name, and lesson
 # On open just have a selection window
 
+
 class DOC_STATUS(Enum):
     DOC_LENGTH_CHANGED = 0
     DOC_LENGTH_SAME = 1
     DOC_CLOSED = 2
+
 
 class Word:
     def __init__(self):
@@ -46,7 +48,7 @@ class Word:
     def Word2010(self, details):
         # take course name, lesson and video name
         doc_start = self.doc.Range(0, 0)
-        #this should be replaced with actual course info
+        # this should be replaced with actual course info
 
         title = details.Course + " - Week " + details.Week + " - " + details.Video + "\n"
 
@@ -68,12 +70,15 @@ class Word:
 
         docText.InsertAfter("Slide 1:")
 
+        if details.Slides != "" and details.Slides != 0:
+            for i in range(2, int(details.Slides)):
+                location = self.doc.Range(0, len(self.doc.Content.Text))
+                location.InsertAfter("Slide " + str(i) + ":\n")
+
         print(len(self.doc.Content.Text))
 
         self.doc.Range(title_len, len(self.doc.Content.Text)).Select()
         self.doc.ActiveWindow.Selection.Style = self.doc.Styles("Heading 2")
-
-        sleep(5)
 
     def Word2013(self, details):
         self.Word2010(details)
@@ -124,15 +129,17 @@ class Word:
         self.doc.Close(False)
         self.Quit()
 
-class Word_Details:
+
+class WordDetails:
     def __init__(self, course_name, week, video_name, num_slides):
         self.Course = str(course_name)
         self.Week = str(week)
         self.Video = str(video_name)
         self.Slides = str(num_slides)
 
+
 class UI:
-    def __init__(self, is_timer=False):
+    def __init__(self):
         """
         A generic UI class that will handle the new/open menu,
         the creation menu, and the timer menu for use
@@ -162,88 +169,120 @@ class UI:
     def Destroy(self):
         self.Root.destroy()
 
+
 class User():
+
     def __init__(self):
         # error here
+        self.LoginPath = 'https://dev.ecampus.oregonstate.edu/transcriptionTracker/login.php'
         self.ui = UI()
-        self.Login()
-        self.Valid = False
+        # error label so each handler can modify it
+        self.ErrorLabel = ttk.Label(self.ui.Mainframe, text="", foreground='red')
         self.Name = ""
+        self.Id = ""
+        self.Login()
 
     def Login(self):
-        ttk.Label(self.ui.Mainframe, text="Login or Register. If logging in, only an ID is necessary.") \
+        ttk.Label(self.ui.Mainframe, text="Login or Register. If logging in, only an ONID Username is necessary.") \
             .grid(column=1, row=1, sticky=tk.W)
-        ttk.Label(self.ui.Mainframe, text="OSU ID:").grid(column=1, row=2, sticky=tk.W)
-        ttk.Label(self.ui.Mainframe, text="Name:").grid(column=1, row=3, sticky=tk.W)
+        ttk.Label(self.ui.Mainframe, text="ONID Username:").grid(column=1, row=3, sticky=tk.W)
+        ttk.Label(self.ui.Mainframe, text="Name:").grid(column=1, row=4, sticky=tk.W)
+
+        # define error label so that login / register can update if an error occurs
+        self.ErrorLabel.grid(column=1,row=2, sticky=tk.W)
 
         osu_id = tk.StringVar()
         name = tk.StringVar()
 
         # set up entries with placeholders, will need an event handler for focus in
-        tk.Entry(self.ui.Mainframe, width=15, textvariable=osu_id).grid(column=1, row=2)
-        tk.Entry(self.ui.Mainframe, width=15, textvariable=name).grid(column=1, row=3)
+        tk.Entry(self.ui.Mainframe, width=15, textvariable=osu_id).grid(column=1, row=3)
+        tk.Entry(self.ui.Mainframe, width=15, textvariable=name).grid(column=1, row=4)
 
         ttk.Button(self.ui.Mainframe, text="Login",
-                   command=lambda: self.Handle_Login(osu_id.get())).grid(column=2, row=4, sticky=tk.E)
+                   command=lambda: self.Handle_Login(osu_id.get())).grid(column=2, row=5, sticky=tk.E)
 
         ttk.Button(self.ui.Mainframe, text="Register",
-                   command=lambda: self.Handle_Register(osu_id.get(), name.get())).grid(column=3, row=4, sticky=tk.E)
+                   command=lambda: self.Handle_Register(osu_id.get(), name.get())).grid(column=3, row=5, sticky=tk.E)
 
         for child in self.ui.Mainframe.winfo_children(): child.grid_configure(padx=5, pady=5)
 
         self.ui.Root.mainloop()
 
     def Handle_Login(self, id):
-        status = File_Handler.Check_File(id)
-        if not status: print("Failed to Login, try registering first.\n")
+        if not User.Validate_User_Credentials(id, 0, 'Login'):
+            self.ErrorLabel.config(text='Invalid Credentials Entered')
+            return False
+
         else:
-            self.Name = status.split('&')[1]
-            r = requests.post('https://dev.ecampus.oregonstate.edu/transcriptionTracker/',
-                              data = {'id': id})
-            if not User.Validate(r.text):
+            response = requests.post(self.LoginPath,
+                                     data = {'id': id})
+            userResult = User.Validate_Server_Response(response)
+            if not userResult:
+                self.ErrorLabel.config(text='Error attempting to Login')
+                return False
+
+            else:
+                self.Name = userResult
+                self.Id = id
 
             self.Valid = True
             self.ui.Destroy()
-            Menu.New_Or_Open()
+            return True
 
     def Handle_Register(self, id, name):
-        File_Handler.Add_To_File(id, name)
-        status = File_Handler.Check_File(id)
-        if not status:
-            print("Failed to Register, exiting.\n")
-            exit(1)
+        if not User.Validate_User_Credentials(id, name, 'Register'):
+            self.ErrorLabel.config(text='Invalid Credentials Entered')
+            return False
+
         else:
-            self.Name = status.split('&')[1]
-            # url: https://dev.ecampus.oregonstate.edu/transcriptionTracker/
-            r = requests.post('https://dev.ecampus.oregonstate.edu/transcriptionTracker/',
-                              data = {'name': self.Name, 'id': id})
-            if not User.Validate(r.text):
-                print('Unable to Register')
-                exit(1)
+            response = requests.post(self.LoginPath,
+                                     data = {'name': name, 'id': id})
+            userResult = User.Validate_Server_Response(response)
+            if not userResult:
+                self.ErrorLabel.config(text='Error attempting to Register')
+                return False
+            else:
+                self.Name = userResult
+                self.Id = id
             self.Valid = True
             self.ui.Destroy()
-            Menu.New_Or_Open()
+            return True
 
     @staticmethod
-    def Validate(text):
-        if 'Valid' in text: return True
-        else: return False
+    def Validate_User_Credentials(id, name, callingFunc):
+        if callingFunc == 'Register' and (name == "" or id == ""): return False
+        elif callingFunc == 'Login' and id == "": return False
+        return True
+
+    @staticmethod
+    def Validate_Server_Response(text):
+        data = text.json()
+        print(data)
+        if not data['success']:
+            return False
+        else:
+            return data['name']
+
 
 class Menu(UI):
     # holds the Word_Details class info
     Details = ""
 
     @staticmethod
-    def New_Or_Open():
+    def New_Or_Open(name):
         ui = UI()
+
+        ttk.Label(ui.Mainframe, text="Login Successful, Welcome " + name + ".", foreground="green")\
+            .grid(column=1,row=1, sticky=tk.W)
+
         # button initialization
         ttk.Label(ui.Mainframe, text="Create a new document, or open a current document.")\
-            .grid(column=2, row=1, sticky=tk.N)
+            .grid(column=1, row=2, sticky=tk.N)
 
         ttk.Button(ui.Mainframe, text="New", command= lambda: Menu.Destroy_And_Call(ui, Menu.New_Document))\
-            .grid(column=2, row=2, sticky=tk.E)
+            .grid(column=2, row=3, sticky=tk.E)
         ttk.Button(ui.Mainframe, text="Open", command= lambda: Menu.Destroy_And_Call(ui, Menu.Open_Document))\
-            .grid(column=3, row=2, sticky=tk.W)
+            .grid(column=3, row=3, sticky=tk.W)
 
         for child in ui.Mainframe.winfo_children(): child.grid_configure(padx=5, pady=5)
 
@@ -278,7 +317,7 @@ class Menu(UI):
                    command=lambda: Menu.Validate_Word_Details(ui,
                                                           Menu.Timer,
                                                           Menu.New_Document,
-                                                          Word_Details(course_name.get(),
+                                                          WordDetails(course_name.get(),
                                                                        week.get(),
                                                                        video_name.get("1.0", tk.END),
                                                                        num_slides.get())))\
@@ -352,7 +391,7 @@ class Menu(UI):
 
         # every 180 seconds check to see if document length has changed
         # if it hasn't remove the last three minutes or if document has closed
-        if count == 180:
+        if count % 180 == 0:
             print(count)
             status, new_length = Word.Check_Document_Length(previous_length)
             if status == DOC_STATUS.DOC_LENGTH_SAME:
@@ -417,26 +456,29 @@ class Menu(UI):
         ui.Destroy()
         function()
 
-class File_Handler():
-    path = 'users.txt'
-    sentinel = '&'
-
-    @staticmethod
-    def Check_File(symbol):
-        with open(File_Handler.path, 'r') as file:
-            for line in file:
-                if symbol in line:
-                    return line
-        return False
-
-    @staticmethod
-    def Add_To_File(prefix, suffix):
-        with open(File_Handler.path, 'a+') as file:
-            file.write(prefix + File_Handler.sentinel + suffix + '\n')
+# class File_Handler():
+#     path = 'users.txt'
+#     sentinel = '&'
+#
+#     @staticmethod
+#     def Check_File(symbol):
+#         with open(File_Handler.path, 'r') as file:
+#             for line in file:
+#                 if symbol in line:
+#                     return line
+#         return False
+#
+#     @staticmethod
+#     def Add_To_File(prefix, suffix):
+#         with open(File_Handler.path, 'a+') as file:
+#             file.write(prefix + File_Handler.sentinel + suffix + '\n')
 
 if __name__ == '__main__':
+    # validate user
     user = User()
-    #Menu.Timer()
+
+    # menu to start, pass in user's name
+    Menu.New_Or_Open(user.Name)
 
 
 # VBA -> Python notes:
