@@ -1,0 +1,657 @@
+html
+{height: 100%;  }
+
+body
+{
+    overflow:hidden;
+    padding-bottom: 20em;
+    background-color: #373737;
+    color: white;
+}
+
+div.page
+{
+    width: 1000px;
+    margin: 0 auto;
+}
+
+
+div#wrapper
+{
+
+}
+
+h1
+{
+    font-family: "Lucida Grande", "Lucida Sans Unicode", Arial, sans-serif;
+    color: white;
+    letter-spacing: -1px;
+    line-height: 190%;
+    text-indent: 6em;
+    font-size: 28px;
+    position: relative;
+    right: .27em;
+    bottom: .3em;
+    width:101.25%;
+    height: 2em;
+    background-color: #e2620e;
+}
+
+div.tag
+{
+    font-weight: 100;
+    position: relative;
+    right: 6em;
+    float: right;
+}
+
+img.scoreboard
+{
+    position: relative;
+    top: 1em;
+    left: -5em;
+    width:25.5em;
+}
+
+img.scoreboardArrow
+{
+    position: relative;
+    cursor: pointer;
+    top: -49.3em;
+    left: 15.5em;
+    width: 1.3em;
+}
+
+div.users
+{
+    position: relative;
+    top: -44.3em;
+    left: -3.5em;
+    width: 23.4em;
+}
+
+img.slots
+{
+
+    width: 21.5em;
+    margin-bottom: -1.1em;
+}
+
+img.crown
+{
+    position: relative;
+    margin-bottom: -3em;
+    top: -7.9em;
+    left: 1em;
+
+    display: none;
+}
+
+img.placeholder
+{
+    position: relative;
+    width: 3.5em;
+    top: -3em;
+    left: .6em;
+    margin-bottom: -1.5em;
+}
+
+img#myPic
+{
+    position: absolute;
+    left: 4.25em;
+    top: 6.6em;
+}
+
+img#myPic2
+{
+    position: absolute;
+    left: .5em;
+    top: .5em;
+}
+
+div.level
+{
+    font-family: "Lucida Grande", "Lucida Sans Unicode", Arial, sans-serif;
+    color: white;
+    color: white;
+    letter-spacing: -1px;
+    font-size: 1.5em;
+    position: relative;
+    top: -2.8em;
+    left: 3.3em;
+    margin-bottom: -1.5em;
+}
+
+img.badgeSlots
+{
+    position: relative;
+    left: 13.7em;
+    width: 7em;
+    margin-bottom: -2em;
+    top: -5.1em;
+}
+
+
+img.badge
+{
+    position: relative;
+    width:2em;
+    margin-bottom: -2.3em;
+    margin-right: .4em;
+    top: -5.3em;
+    left: 6.3em;
+}
+
+
+
+div.entryHolder
+{
+    position: relative;
+    width: 100%;
+    height: 8em;
+    top: .5em;
+}
+
+img.entry
+{
+    position: absolute;
+    width: 41em;
+    left: .5em;
+    top: .3em;
+}
+
+div.progressHolder
+{
+    position: relative;
+    width: 100%;
+    height: 13em;
+    top: 1.7em;
+}
+
+img.progress
+{
+    position: relative;
+    width: 41em;
+    left: .5em;
+    top: 0em;
+}
+
+img.progressCircle
+{
+    position: absolute;
+    top:6.3em;
+    left: 4em;
+    width: 4em;
+}
+
+img.myBadge
+{
+    position: relative;
+    width:2.2em;
+    margin-bottom: -2.3em;
+    margin-right: .5em;
+    top: -10.7em;
+    left: 3.2em;
+
+    z-index: 1;
+
+    cursor: pointer;
+}
+
+img.expBar
+{
+    position: relative;
+    top: -2.5em;
+    left: 12.5em;
+}
+
+div.toolText
+{
+    display: none;
+    position: absolute;
+    top: 1.7em;
+    left: 39.2em;
+    font-size: .8em;
+}
+
+div.SBToolText
+{
+    position: relative;
+    top: -10em;
+    left: 17em;
+    font-size: .8em;
+    z-index: 10;
+    margin-bottom: -2em;
+}
+
+div.nameText
+{
+    position: relative;
+    top: -11em;
+    left: -11.2em;
+    font-size: .8em;
+    z-index: 10;
+    margin-bottom: -2em;
+	text-align: center;
+}
+
+img.nameTip
+{
+    position: relative;
+    top: -8.5em;
+    left: -1.35em;
+
+    margin-bottom: -1.6em;
+	
+}
+
+img.toolTip
+{
+    position: absolute;
+    top: 1em;
+    left: 30.9em;
+}
+
+img.SBToolTip
+{
+    position: relative;
+    top: -7.7em;
+    left: 13.25em;
+
+    margin-bottom: -1.5em;
+}
+
+div.SBToolText
+{}
+
+div.currLevel
+{
+    font-family: "Lucida Grande", "Lucida Sans Unicode", Arial, sans-serif;
+    color: #969696;
+    letter-spacing: -1px;
+    font-size: 1.6em;
+    position: relative;
+    top: -4em;
+    left: 7.8em;
+
+}
+
+div.nextLevel
+{
+    font-family: "Lucida Grande", "Lucida Sans Unicode", Arial, sans-serif;
+    color: #969696;
+    letter-spacing: -1px;
+    font-size: 1.6em;
+    position: relative;
+    top: -5.5em;
+    left: 20em;
+
+}
+
+div.hours
+{
+    font-family: "Lucida Grande", "Lucida Sans Unicode", Arial, sans-serif;
+    color: #969696;
+    letter-spacing: -1px;
+    font-size: 1.6em;
+    position: relative;
+    top: -9.8em;
+    left: 8.3em;
+}
+
+div.expNumber
+{
+    position: absolute;
+    top: 10.35em;
+    left: 24.1em;
+    display:none;
+}
+
+#expNumber0
+{
+    top: 10.5em;
+}
+
+#expNumber1
+{
+    left: 26.4em;
+}
+
+#expNumber2
+{
+    left: 27em;
+    top: 10.5em;
+}
+
+img.myBadgeHolder
+{
+    position: absolute;
+    top: 3.4em;
+    left: 31em;
+}
+
+#myBadgeHolder1
+{
+    left: 22em;
+    display:none;
+}
+
+#myBadgeHolder2
+{
+    left: 13em;
+    display:none;
+}
+
+div.newfoundHolder
+{
+    position: absolute;
+    top: 24.5em;
+    width: 100%;
+    height: 26em;
+}
+
+img.newfound
+{
+    position: relative;
+    width: 41em;
+    left: .5em;
+    top: -0em;
+}
+
+div.newfoundContent
+{
+    position: absolute;
+    top: 0em;
+}
+
+img.newfoundBorder
+{
+    position: absolute;
+    top: 6.6em;
+    left: 2em;
+    width: 38em;
+}
+
+div.newfoundPrompt
+{
+    font-family: "Lucida Grande", "Lucida Sans Unicode", Arial, sans-serif;
+    color: white;
+    letter-spacing: -1px;
+    font-size: 1.5em;
+    position: absolute;
+    top: .8em;
+    left: 6em;
+}
+
+img.newfoundBorder2
+{
+    position: relative;
+    width: 38em;
+}
+
+textarea.newfoundFact
+{
+    font-family: "Lucida Grande", "Lucida Sans Unicode", Arial, sans-serif;
+    color: White;
+    letter-spacing: -1px;
+    font-size: 1.6em;
+
+    position: absolute;
+    width: 21.8em;
+    height: 6em;
+    top: 3em;
+    left: 1em;
+
+    background-color:#b8b8b8;
+
+    resize: none;
+}
+
+div.newfoundInput
+{
+    position: relative;
+    top: -164.1em;
+    left:122em;
+}
+
+div.submit
+{
+    font-family: "Lucida Grande", "Lucida Sans Unicode", Arial, sans-serif;
+    color: White;
+    letter-spacing: -1px;
+    font-size: 1.3em;
+    width: 4em;
+    height: 1.5em;
+    position: relative;
+    top: .5em;
+    left: 12.5em;
+
+    text-indent: .4em;
+
+    background-color: #b8b8b8;
+    cursor: pointer;
+}
+
+div.submit:hover
+{
+    background-color: #9b9b9b;
+}
+
+img#newfoundPic
+{
+    position: absolute;
+    top: 7em;
+    left: 2.5em;
+}
+
+img.add
+{
+    position: absolute;
+    top: 1.7em;
+    left: 37.5em;
+    cursor: pointer;
+}
+
+img.animationBlock
+{
+    position: absolute;
+    top: 0em;
+    left: 41.1em;
+    z-index: 10;
+}
+
+div.newfoundText
+{
+    font-family: "Lucida Grande", "Lucida Sans Unicode", Arial, sans-serif;
+    color: white;
+    letter-spacing: -1px;
+    font-size: 1.8em;
+    width: 20em;
+
+    position: absolute;
+    top: 6.5em;
+    left:2em;
+
+}
+
+img.LA
+{
+    position: relative;
+    top: 23.2em;
+    left: 17em;
+    cursor: pointer;
+}
+
+img.RA
+{
+    position: relative;
+    top: 23.2em;
+    left: 22em;
+    cursor: pointer;
+}
+
+div.rightContent
+{
+    position: relative;
+    top: -144.2em;
+    width: 42em;
+    height: 51em;
+    left: 25.3em;
+}
+
+
+img.experience
+{
+    position: relative;
+    width: 41.5em;
+    top: -96.5em;
+    left: 26em;
+
+}
+
+div.exp
+{
+    position: relative;
+    top: -47em;
+    display:none;
+}
+
+div.exptitle
+{
+    font-family: "Lucida Grande", "Lucida Sans Unicode", Arial, sans-serif;
+    color: white;
+    letter-spacing: -1px;
+
+    font-size: 2em;
+    position: absolute;
+    top: -47.1em;
+    left: 21em;
+    z-index: 20;
+}
+
+#canvas
+{
+    position: relative;
+    top:-136.5em;
+    left:28em;
+}
+
+img.divider
+{
+    position: relative;
+    left: 23em;
+    width:.174em;
+    top:-93.5em;
+}
+
+div.titlefont
+{
+    font-family: "Lucida Grande", "Lucida Sans Unicode", Arial, sans-serif;
+    color: white;
+    letter-spacing: -1px;
+    line-height: 190%;
+    font-size: 28px;
+}
+
+div.scoretitle
+{
+    position: relative;
+    top: -26.8em;
+    left: 2em;
+}
+
+div.entrytitle
+{
+    position: relative;
+    top: 1.2em;
+    left: 1em;
+}
+
+div.progresstitle
+{
+    position: absolute;
+    top: 1.5em;
+    left: 1.3em;
+}
+
+div.newfoundtitle
+{
+    position: absolute;
+    top: .5em;
+    left: 7em;
+    z-index: 10;
+}
+
+form.new_update
+{
+    position: relative;
+    top: -.6em;
+    left: 14em;
+}
+
+input.length
+{
+    text-align: center;
+    width: 10em;
+    height: 3em;
+
+    border-style: solid;
+    border-width: .2em;
+    border-color: #969696;
+    border-radius: 7px;
+
+    font-family: "Lucida Grande", "Lucida Sans Unicode", Arial, sans-serif;
+    letter-spacing: -1px;
+}
+
+input.length:focus
+{
+    outline:none;
+    border-color: #5d5d5d;
+}
+
+div.actions
+{
+    position: relative;
+    top: -.5em;
+}
+
+
+select.subject
+{
+    color: #969696;
+    text-indent: 2.5em;
+    position: relative;
+    width: 10em;
+    height: 3em;
+    left: 12em;
+    top: -3em;
+
+    border-style: solid;
+    border-width: .2em;
+    border-color: #969696;
+    border-radius: 7px;
+
+    font-family: "Lucida Grande", "Lucida Sans Unicode", Arial, sans-serif;
+    letter-spacing: -1px;
+    cursor: pointer;
+}
+
+select.subject:focus
+{
+    outline:none;
+    border-color: #5d5d5d;
+}
+
+input.update
+{
+    position: relative;
+    left: 25.5em;
+    top: -5.3em;
+}
+
+div.info
+{
+    display:none;
+}

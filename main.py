@@ -107,7 +107,7 @@ class Word:
         else:
             word = win32.GetActiveObject('Word.Application')
             doc = word.ActiveDocument
-            if (len(doc.Content.Text) == previous_length):
+            if len(doc.Content.Text) == previous_length:
                 return DOC_STATUS.DOC_LENGTH_SAME, previous_length
             else:
                 return DOC_STATUS.DOC_LENGTH_CHANGED, len(doc.Content.Text)
@@ -455,23 +455,6 @@ class Menu(UI):
     def Destroy_And_Call(ui, function):
         ui.Destroy()
         function()
-
-# class File_Handler():
-#     path = 'users.txt'
-#     sentinel = '&'
-#
-#     @staticmethod
-#     def Check_File(symbol):
-#         with open(File_Handler.path, 'r') as file:
-#             for line in file:
-#                 if symbol in line:
-#                     return line
-#         return False
-#
-#     @staticmethod
-#     def Add_To_File(prefix, suffix):
-#         with open(File_Handler.path, 'a+') as file:
-#             file.write(prefix + File_Handler.sentinel + suffix + '\n')
 
 if __name__ == '__main__':
     # validate user
