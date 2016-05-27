@@ -1,0 +1,22 @@
+body {
+	background-color: #373737;
+}
+
+.divider-vertical-l {
+    height: 700px;                   
+    border-left: 1px solid white;     
+    float: left;                     
+    /*opacity: 0.5;                    
+    margin: 0 15px; */                 
+}
+.divider-vertical-r {
+    height: 700px;                   
+    border-right: 1px solid white;     
+    float: right;                     
+    /*opacity: 0.5;                    
+    margin: 0 15px; */                 
+}
+
+.row-no-left {
+	margin-right: -15px;
+}
