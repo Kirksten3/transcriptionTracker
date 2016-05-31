@@ -25,22 +25,36 @@
 				<div class="col-md-4">
 					<!-- scoreboard info -->
 					<div class="panel panel-default">
-						<div class="panel-heading">
-							Scoreboard
-							<a id="chart" href="#" class="btn btn-default btn-md">
-					        	Chart <span class="glyphicon glyphicon-signal"></span> 
+						<div class="panel-heading clearfix">
+							<span style="padding-top:7.5px;" class="panel-title pull-left">Scoreboard</span>
+							<a id="chart" href="#" class="btn btn-default btn-md pull-right">
+								<!-- use this id to switch between image onclick in jquery -->
+					        	<span id="graph-progress-btn" class="glyphicon glyphicon-signal"></span> 
 					        </a>
 						</div>
 						<div class="panel-body">
 							<div class="panel-group">
+								<!-- these will have to be propagated automatically in the future -->
 								<div class="panel panel-default">
 									<div class="panel-body">
-										USER 1
+										<img src='gui/assets/Kendall.png' class='image-thumbnail' />
+										<span>Kendall Henery</span>
+										<imggroup>
+											<img src='gui/assets/badge-slot.png' class='image-badge' />
+											<img src='gui/assets/badge-slot.png' class='image-badge' />
+											<img src='gui/assets/badge-slot.png' class='image-badge' />
+										<imggroup>
 									</div>
 								</div>
 								<div class="panel panel-default">
 									<div class="panel-body">
-										USER 2
+										<img src='gui/assets/Zach.png' class='image-thumbnail' />
+										<span>Zach Homen</span>
+										<imggroup>
+											<img src='gui/assets/badge-slot.png' class='image-badge' />
+											<img src='gui/assets/badge-slot.png' class='image-badge' />
+											<img src='gui/assets/badge-slot.png' class='image-badge' />
+										<imggroup>
 									</div>
 								</div>
 								<div class="panel panel-default">
@@ -63,29 +77,48 @@
 					<div class="divider-vertical-r"></div>
 				</div>
 				<div class="col-md-7">
-					<!-- Experience -->
-					<div class="row-no-left">
-						<div class="panel panel-default">
-							<div class="panel-heading">
-								Progress for ...
+					<div id='experience'>
+						<!-- Experience -->
+						<div>
+							<div class="panel panel-default">
+								<div class="panel-heading">
+									Progress for ...
+								</div>
+								<div class="panel-body">
+									PROGRESS GOES HERE
+								</div>
 							</div>
-							<div class="panel-body">
-								PROGRESS GOES HERE
+						</div>
+						<div>
+							<div class="panel panel-default">
+								<div class="panel-heading">
+									Newfound Knowledge
+								</div>
+								<div class="panel-body">
+									KNOWLEDGE STUFF HERE
+								</div>
 							</div>
 						</div>
 					</div>
-					<div class="row-no-left">
-						<div class="panel panel-default">
-							<div class="panel-heading">
-								Newfound Knowledge
-							</div>
-							<div class="panel-body">
-								KNOWLEDGE STUFF HERE
+					<!-- hidden until signal (graph) button is pressed -->
+					<div id='graph' style="display:none;">
+						<!-- graph section -->
+						<div>
+							<div class="panel panel-default">
+								<div class="panel-heading">
+									Bar chart showing student comparison
+								</div>
+								<div class="panel-body">
+									CHART GOES HERE
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
+		
+		<!-- scripts -->
+		<script src="gui/eventHandlers.js" type="text/javascript"></script>
 	</body>
 </html>
