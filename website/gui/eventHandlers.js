@@ -12,6 +12,13 @@ $('#chart').on('click', function() {
 	toggleGraphView();
 });
 
+$('.panel-select').on('click', function() {
+	$('.panel-select').removeClass('panel-active');
+	$(this).addClass('panel-active');
+	
+	//also switch progress view
+});
+
 function toggleGraphView() {
 	$('#experience').toggle();
 	$('#graph').toggle();

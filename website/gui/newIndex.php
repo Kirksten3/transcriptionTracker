@@ -33,8 +33,12 @@
 					        </a>
 						</div>
 						<div class="panel-body">
-							<div class="panel-group">
+							<div class="panel-group" style="margin-bottom: 0px;">
+								<?php
+									UI::CreateUserBoxes();
+								?>
 								<!-- these will have to be propagated automatically in the future -->
+								<!--
 								<div class="panel panel-default">
 									<div class="panel-body">
 										<img src='gui/assets/Kendall.png' class='image-thumbnail' />
@@ -66,7 +70,7 @@
 									<div class="panel-body">
 										USER 4
 									</div>
-								</div>
+								</div> -->
 							</div>
 							<!-- List of everyone -->
 						</div>
