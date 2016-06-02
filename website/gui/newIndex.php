@@ -85,8 +85,8 @@
 						<!-- Experience -->
 						<div>
 							<div class="panel panel-default">
-								<div class="panel-heading">
-									Progress for ...
+								<div id='progress-header' class="panel-heading">
+									<span></span>
 								</div>
 								<div class="panel-body">
 									PROGRESS GOES HERE

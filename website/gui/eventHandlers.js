@@ -15,7 +15,9 @@ $('#chart').on('click', function() {
 $('.panel-select').on('click', function() {
 	$('.panel-select').removeClass('panel-active');
 	$(this).addClass('panel-active');
-	
+	var name = $(this).children("span").text();
+	$('#progress-header > span').text("");
+	$('#progress-header > span').text("Progress for " + name);
 	//also switch progress view
 });
 
